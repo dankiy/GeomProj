@@ -6,6 +6,9 @@ class curve
 {
 public:
     curve();
+
+private:
+
 };
 
 #endif // CURVE_H
