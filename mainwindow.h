@@ -20,18 +20,20 @@ public:
     void getData();
     double fy(double x, bool t);
     double fx(bool t);
+    double fsqrt(double x);
 private slots:
-
     void on_drw_clicked();
-
     // void on_clear_clicked();
-
+protected:
+    virtual void wheelEvent(QWheelEvent *event);
+    //virtual void mouseEvent(QMouseEvent *event);
 private:
     Ui::MainWindow *ui;
     double X2, Y2, X, Y, XY, Z, D;
     double leftX, rightX;
     double botY, topY;
     int pictWidth, pictHeight;
+    double ratio;
     double step;
     double onePixelX, onePixelY;
     double Ox, Oy;
