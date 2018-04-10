@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtGui>
+#include <curve.h>
 
 namespace Ui {
 class MainWindow;
@@ -18,9 +19,9 @@ public:
     void drawGraph(bool notEmpty = 0);
     void recountPixels();
     void getData();
-    double fy(double x, bool t);
-    double fx(bool t);
-    double fsqrt(double x);
+    //double fy(double x, bool t);
+    //double fx(bool t);
+    // double fsqrt(double x);
 private slots:
     void on_drw_clicked();
     // void on_clear_clicked();
@@ -29,7 +30,8 @@ protected:
     //virtual void mouseEvent(QMouseEvent *event);
 private:
     Ui::MainWindow *ui;
-    double X2, Y2, X, Y, XY, Z, D;
+    Curve func;
+    int type;
     double leftX, rightX;
     double botY, topY;
     int pictWidth, pictHeight;

@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <cmath>
 #include <QDebug>
-#include "curve.h"
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -28,7 +27,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-double MainWindow::fy(double x, bool t)
+/*double MainWindow::fy(double x, bool t)
 {
    if (Y2 != 0)
    {
@@ -57,7 +56,7 @@ double MainWindow::fx(bool t)
 double MainWindow::fsqrt(double x)
 {
     return (1/(sin(x)));
-}
+}*/
 void MainWindow::recountPixels()
 {
     onePixelX = pictWidth / (rightX-leftX);
@@ -68,12 +67,13 @@ void MainWindow::recountPixels()
 
 void MainWindow::getData()
 {
-    X2 = ui -> inputX2 -> text().toDouble();
-    Y2 = ui -> inputY2 -> text().toDouble();
-    XY = ui -> inputXY -> text().toDouble();
-    X = ui -> inputX -> text().toDouble();
-    Y = ui -> inputY -> text().toDouble();
-    Z = ui -> inputZ -> text().toDouble();
+    func =  Curve(ui -> inputX2 -> text().toDouble(),
+                  ui -> inputY2 -> text().toDouble(),
+                  ui -> inputXY -> text().toDouble(),
+                  ui -> inputX -> text().toDouble(),
+                  ui -> inputY -> text().toDouble(),
+                  ui -> inputZ -> text().toDouble());
+    type = func.getType();
 }
 
 void MainWindow::drawGraph(bool notEmpty)
@@ -117,31 +117,31 @@ void MainWindow::drawGraph(bool notEmpty)
 
     paint.setRenderHint(QPainter::Antialiasing, true);
     QPainterPath path;
-    if (X == 7357)
+    if (type == 0)
     {
         bool first = true;
-        double last = fsqrt(leftX);
+        double last = func.ftest(leftX);
 
         for(double i = (double)leftX + step; i <= (double)rightX; i += step)
         {
-            if(!isnan(fsqrt(i)))
+            if(!isnan(func.ftest(i)))
             {
                 if(first)
                 {
-                    last = fsqrt(i);
-                    path.moveTo((i + Ox) * onePixelX, (fsqrt(i) + Oy) * onePixelY);
+                    last = func.ftest(i);
+                    path.moveTo((i + Ox) * onePixelX, (func.ftest(i) + Oy) * onePixelY);
                     first = false;
                 }
                 else
                 {
-                    if ((abs(last - fsqrt(i)) >= (topY-botY)))
+                    if ((abs(last - func.ftest(i)) >= (topY-botY)))
                     {
                         first = true;
                     }
                     else
                     {
-                    last = fsqrt(i);
-                    path.lineTo((i + Ox) * onePixelX, (fsqrt(i) + Oy) * onePixelY);
+                    last = func.ftest(i);
+                    path.lineTo((i + Ox) * onePixelX, (func.ftest(i) + Oy) * onePixelY);
                     }
                 }
             }
@@ -151,91 +151,91 @@ void MainWindow::drawGraph(bool notEmpty)
     }
     else
     {
-    if ((Y2 == 0) && (Y == 0) && (XY == 0))
-    {
-        bool signD = true;
-
-        if(!isnan(fx(signD)))
+        if (type == 1)
         {
-            path.moveTo((Oy + fx(signD)) * onePixelY, 0);
-            path.lineTo((Oy + fx(signD)) * onePixelY, pictHeight);
+            bool signD = true;
 
-        }
-
-        signD = false;
-
-        if(!isnan(fx(signD)))
-        {
-            path.moveTo((Oy + fx(signD)) * onePixelY, 0);
-            path.lineTo((Oy + fx(signD)) * onePixelY, pictHeight);
-        }
-    }
-    else
-    {
-        bool first = true;
-        bool signD = true;
-        double last;
-
-        for(double i = (double)leftX + step; i <= (double)rightX; i += step)
-        {
-            if(!isnan(fy(i, signD)))
+            if(!isnan(func.fx(signD)))
             {
+                path.moveTo((Ox + func.fx(signD)) * onePixelY, 0);
+                path.lineTo((Ox + func.fx(signD)) * onePixelY, pictHeight);
 
-                if(first)
+            }
+
+            signD = false;
+
+            if(!isnan(func.fx(signD)))
+            {
+                path.moveTo((Ox + func.fx(signD)) * onePixelY, 0);
+                path.lineTo((Ox + func.fx(signD)) * onePixelY, pictHeight);
+            }
+        }
+        else
+        {
+            bool first = true;
+            bool signD = true;
+            double last;
+
+            for(double i = (double)leftX + step; i <= (double)rightX; i += step)
+            {
+                if(!isnan(func.fy(i, signD)))
                 {
-                    last = fy(i, signD);
-                    path.moveTo((i + Ox) * onePixelX, (fy(i, signD) + Oy) * onePixelY);
-                    first = false;
-                }
-                else
-                {
-                    if ((abs(last - fy(i, signD)) >= (topY-botY)))
+
+                    if(first)
                     {
-                        first = true;
+                        last = func.fy(i, signD);
+                        path.moveTo((i + Ox) * onePixelX, (func.fy(i, signD) + Oy) * onePixelY);
+                        first = false;
                     }
                     else
                     {
-                    last = fy(i, signD);
-                    path.lineTo((i + Ox) * onePixelX, (fy(i, signD) + Oy) * onePixelY);
+                        if ((abs(last - func.fy(i, signD)) >= (topY-botY)))
+                        {
+                            first = true;
+                        }
+                        else
+                        {
+                        last = func.fy(i, signD);
+                        path.lineTo((i + Ox) * onePixelX, (func.fy(i, signD) + Oy) * onePixelY);
+                        }
                     }
                 }
-            }
-            else
-                first = true;
-        }
-
-        first = true;
-        signD = false;
-
-        for(double i = (double)leftX + step; i <= (double)rightX; i += step)
-        {
-            if(!isnan(fy(i, signD)))
-            {
-
-
-                if(first)
-                {
-                    last = fy(i, signD);
-                    path.moveTo((i + Ox) * onePixelX, (fy(i, signD) + Oy) * onePixelY);
-                    first = false;
-                }
                 else
+                    first = true;
+            }
+
+            first = true;
+            signD = false;
+
+            for(double i = (double)leftX + step; i <= (double)rightX; i += step)
+            {
+                if(!isnan(func.fy(i, signD)))
                 {
-                    if ((abs(last - fy(i, signD)) >= (topY-botY)))
+
+
+                    if(first)
                     {
-                        first = true;
+                        last = func.fy(i, signD);
+                        path.moveTo((i + Ox) * onePixelX, (func.fy(i, signD) + Oy) * onePixelY);
+                        first = false;
                     }
                     else
                     {
-                    last = fy(i, signD);
-                    path.lineTo((i + Ox) * onePixelX, (fy(i, signD) + Oy) * onePixelY);
+                        if ((abs(last - func.fy(i, signD)) >= (topY-botY)))
+                        {
+                            first = true;
+                        }
+                        else
+                        {
+                        last = func.fy(i, signD);
+                        path.lineTo((i + Ox) * onePixelX, (func.fy(i, signD) + Oy) * onePixelY);
+                        }
                     }
                 }
+                else
+                    first = true;
             }
-            else
-                first = true;
         }
-    }
     }
     paint.setPen(QPen(Qt::blue,1,Qt::SolidLine));
     paint.drawPath(path);
@@ -252,7 +252,7 @@ void MainWindow::on_clear_clicked()
 */
 void MainWindow::on_drw_clicked()
 {
-    QString Draw = ("Draw(");
+    QString Draw = "Draw(";
     Draw += (((ui -> inputX2 -> text() == NULL) ? "0" : ui -> inputX2 -> text()) + ", ");
     Draw += (((ui -> inputY2 -> text() == NULL) ? "0" : ui -> inputY2 -> text()) + ", ");
     Draw += (((ui -> inputXY -> text() == NULL) ? "0" : ui -> inputXY -> text()) + ", ");
@@ -283,7 +283,6 @@ void MainWindow::wheelEvent(QWheelEvent *event)
         ui -> log -> append("ZoomOut();");
     }
     recountPixels();
-    getData();
     drawGraph(1);
 }
 /*void MainWindow::mouseEvent(QMouseEvent *event)
