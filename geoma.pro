@@ -26,11 +26,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    curve.cpp
+    curve.cpp \
+    curve.cpp \
+    log.cpp
 
 HEADERS += \
         mainwindow.h \
-    curve.h
+    curve.h \
+    curve.h \
+    log.h
 
 FORMS += \
         mainwindow.ui

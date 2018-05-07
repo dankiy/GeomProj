@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <cmath>
 #include <QDebug>
+#include <fstream>
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -10,24 +11,30 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //logger = Log();
+    //graph outputGraph = new graph();
     //scrollArea -> setVisible(false);
     //scrollArea -> setWidget(ui -> outputGraph);
     //ui -> scrollArea -> setVisible(false);
     pictHeight = 380;
     pictWidth = 540;
     leftX = -20; rightX = 20;
-    step = (abs(leftX) + abs(rightX)) / 40000;
+    accuracy = 80000;
+    step = (abs(leftX) + abs(rightX)) / accuracy;
     ratio = double(pictHeight) / double(pictWidth);
     botY = leftX * (ratio); topY = rightX * (ratio);
+    zoomRate = 1;
     recountPixels();
-    drawGraph(false);
+    drawGraph(false); 
 }
 
 MainWindow::~MainWindow()
 {
+    logger.AddNote("_______________END_____________");
     delete ui;
 }
-/*double MainWindow::fy(double x, bool t)
+/*
+double MainWindow::fy(double x, bool t)
 {
    if (Y2 != 0)
    {
@@ -56,17 +63,25 @@ double MainWindow::fx(bool t)
 double MainWindow::fsqrt(double x)
 {
     return (1/(sin(x)));
-}*/
+}
+*/
 void MainWindow::recountPixels()
 {
+    logger.AddNote("func: recountPixels \n");
     onePixelX = pictWidth / (rightX-leftX);
     onePixelY = pictHeight / (topY-botY);
     Ox = fabs(rightX); Oy = fabs(topY);
-    step = (abs(leftX) + abs(rightX)) / 40000;
+    step = (abs(leftX) + abs(rightX)) / accuracy;
+    logger.AddNote("onePixelX: " + to_string(onePixelX) +
+                   "\nonePixelY: " + to_string(onePixelY) +
+                   "\nOx: " + to_string(Ox) +
+                   "\nOy: " + to_string(Oy) +
+                   "\nstep: " + to_string(step) + '\n');
+    logger.AddNote("funcOut: recountPixels \n");
 }
-
 void MainWindow::getData()
 {
+    logger.AddNote("func: getData \n");
     func =  Curve(ui -> inputX2 -> text().toDouble(),
                   ui -> inputY2 -> text().toDouble(),
                   ui -> inputXY -> text().toDouble(),
@@ -74,13 +89,21 @@ void MainWindow::getData()
                   ui -> inputY -> text().toDouble(),
                   ui -> inputZ -> text().toDouble());
     type = func.getType();
+    logger.AddNote("func type: " + to_string(type) + '\n');
+    logger.AddNote("funcOut: getData \n");
 }
-
+/*
+void MainWindow::getLine()
+{
+    func = Curve()
+}
+*/
 void MainWindow::drawGraph(bool notEmpty)
 {
-    QPixmap graph(pictWidth, pictHeight);
+    logger.AddNote("func: drawGraph \n");
+    QPixmap Graph(pictWidth, pictHeight);
     QPainter paint;
-    paint.begin(&graph);
+    paint.begin(&Graph);
     paint.eraseRect(0, 0, pictWidth, pictHeight);
     paint.drawLine(Ox * onePixelX, 0, Ox * onePixelX, pictHeight);
     paint.drawLine(0, Oy * onePixelY, pictWidth, Oy * onePixelY);
@@ -111,7 +134,7 @@ void MainWindow::drawGraph(bool notEmpty)
     }
     if(!notEmpty) {
         paint.end();
-        ui->outputGraph->setPixmap(graph);
+        ui->outputGraph->setPixmap(Graph);
         return;
     }
 
@@ -240,7 +263,18 @@ void MainWindow::drawGraph(bool notEmpty)
     paint.setPen(QPen(Qt::blue,1,Qt::SolidLine));
     paint.drawPath(path);
     paint.end();
-    ui->outputGraph->setPixmap(graph);
+    ui->outputGraph->setPixmap(Graph);
+    logger.AddNote("pictHeight: " + to_string(pictHeight) +
+                   "\npictWidth: " + to_string(pictWidth) +
+                   "\nleftX: " + to_string(leftX) +
+                   "\nrightX: " + to_string(rightX) +
+                   "\nbotY: " + to_string(botY) +
+                   "\nrightY: " + to_string(topY) +
+                   "\naccuracy: " + to_string(accuracy) +
+                   "\nstep: " + to_string(step) +
+                   "\nratio: " + to_string(ratio) +
+                   "\nzoomRate: " + to_string(zoomRate) + '\n');
+    logger.AddNote("funcOut: drawGraph \n");
     return;
 }
 /*
@@ -252,6 +286,7 @@ void MainWindow::on_clear_clicked()
 */
 void MainWindow::on_drw_clicked()
 {
+    logger.AddNote("event: on_drw_clicked \n");
     QString Draw = "Draw(";
     Draw += (((ui -> inputX2 -> text() == NULL) ? "0" : ui -> inputX2 -> text()) + ", ");
     Draw += (((ui -> inputY2 -> text() == NULL) ? "0" : ui -> inputY2 -> text()) + ", ");
@@ -260,30 +295,49 @@ void MainWindow::on_drw_clicked()
     Draw += (((ui -> inputY -> text() == NULL) ? "0" : ui -> inputY -> text()) + ", ");
     Draw += (((ui -> inputZ -> text() == NULL) ? "0" : ui -> inputZ -> text()) + ");");
     ui -> log -> append(Draw);
+    logger.AddNote(Draw.toStdString() + '\n');
     getData();
     recountPixels();
     drawGraph(true);
+    logger.AddNote("eventEnd: on_drw_clicked \n");
 }
+/*void MainWindow::on_drws_clicked()
+{
+    QString Draw = "Draw(";
+    Draw += ui->inputLine->text();
+    Draw += ");"
+    //getLine();
+    recountPixels();
+    drawGraph(true);
+}
+*/
 void MainWindow::wheelEvent(QWheelEvent *event)
 {
+    logger.AddNote("event: wheelEvent \n");
     if (event -> delta() > 0)
     {
-        leftX += 1;
-        rightX -= 1;
-        botY += 1 * ratio;
-        topY -= 1 * ratio;
-        ui -> log -> append("ZoomIn();");
+        if ((leftX < zoomRate * 5) && (rightX > zoomRate * 5))
+        {
+            leftX += zoomRate;
+            rightX -= zoomRate;
+            botY += zoomRate * ratio;
+            topY -= zoomRate * ratio;
+            ui -> log -> append("ZoomIn();");
+            logger.AddNote("Zoom In with Rate: " + to_string(zoomRate) + '\n');
+        }
     }
     else
     {
-        leftX -= 1;
-        rightX += 1;
-        botY -= 1 * ratio;
-        topY += 1 * ratio;
+        leftX -= zoomRate;
+        rightX += zoomRate;
+        botY -= zoomRate * ratio;
+        topY += zoomRate * ratio;
+        logger.AddNote("Zoom Out with Rate: " + to_string(zoomRate) + '\n');
         ui -> log -> append("ZoomOut();");
     }
     recountPixels();
     drawGraph(1);
+    logger.AddNote("eventEnd: wheelEvent \n");
 }
 /*void MainWindow::mouseEvent(QMouseEvent *event)
 {

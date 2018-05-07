@@ -2,7 +2,7 @@
 #define CURVE_H
 
 class Curve
-{    
+{
 public:
     Curve();
     Curve(double x2, double y2, double xy, double x, double y, double z);

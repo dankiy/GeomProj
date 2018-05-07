@@ -25,7 +25,13 @@
   <property name="windowTitle">
    <string>GeomProj</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
@@ -244,7 +250,7 @@
    <widget class="QLabel" name="outputGraph">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>-50</x>
       <y>10</y>
       <width>540</width>
       <height>380</height>
@@ -285,7 +291,7 @@
      <rect>
       <x>10</x>
       <y>400</y>
-      <width>540</width>
+      <width>501</width>
       <height>40</height>
      </rect>
     </property>
@@ -296,6 +302,23 @@
       <weight>50</weight>
       <bold>false</bold>
      </font>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="drws">
+    <property name="geometry">
+     <rect>
+      <x>517</x>
+      <y>400</y>
+      <width>34</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../Users/www/Desktop/030_lapka-550x550.png</normaloff>../Users/www/Desktop/030_lapka-550x550.png</iconset>
     </property>
    </widget>
   </widget>
