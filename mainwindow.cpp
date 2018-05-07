@@ -67,7 +67,7 @@ double MainWindow::fsqrt(double x)
 */
 void MainWindow::recountPixels()
 {
-    logger.AddNote("func: recountPixels \n");
+    logger.AddNote(">func: recountPixels \n");
     onePixelX = pictWidth / (rightX-leftX);
     onePixelY = pictHeight / (topY-botY);
     Ox = fabs(rightX); Oy = fabs(topY);
@@ -77,11 +77,11 @@ void MainWindow::recountPixels()
                    "\nOx: " + to_string(Ox) +
                    "\nOy: " + to_string(Oy) +
                    "\nstep: " + to_string(step) + '\n');
-    logger.AddNote("funcOut: recountPixels \n");
+    logger.AddNote(">funcOut: recountPixels \n");
 }
 void MainWindow::getData()
 {
-    logger.AddNote("func: getData \n");
+    logger.AddNote(">func: getData \n");
     func =  Curve(ui -> inputX2 -> text().toDouble(),
                   ui -> inputY2 -> text().toDouble(),
                   ui -> inputXY -> text().toDouble(),
@@ -89,8 +89,8 @@ void MainWindow::getData()
                   ui -> inputY -> text().toDouble(),
                   ui -> inputZ -> text().toDouble());
     type = func.getType();
-    logger.AddNote("func type: " + to_string(type) + '\n');
-    logger.AddNote("funcOut: getData \n");
+    logger.AddNote("Curve type: " + to_string(type) + '\n');
+    logger.AddNote(">funcOut: getData \n");
 }
 /*
 void MainWindow::getLine()
@@ -100,7 +100,7 @@ void MainWindow::getLine()
 */
 void MainWindow::drawGraph(bool notEmpty)
 {
-    logger.AddNote("func: drawGraph \n");
+    logger.AddNote(">func: drawGraph \n");
     QPixmap Graph(pictWidth, pictHeight);
     QPainter paint;
     paint.begin(&Graph);
@@ -274,7 +274,7 @@ void MainWindow::drawGraph(bool notEmpty)
                    "\nstep: " + to_string(step) +
                    "\nratio: " + to_string(ratio) +
                    "\nzoomRate: " + to_string(zoomRate) + '\n');
-    logger.AddNote("funcOut: drawGraph \n");
+    logger.AddNote(">funcOut: drawGraph \n");
     return;
 }
 /*
@@ -286,7 +286,7 @@ void MainWindow::on_clear_clicked()
 */
 void MainWindow::on_drw_clicked()
 {
-    logger.AddNote("event: on_drw_clicked \n");
+    logger.AddNote(">event: on_drw_clicked \n");
     QString Draw = "Draw(";
     Draw += (((ui -> inputX2 -> text() == NULL) ? "0" : ui -> inputX2 -> text()) + ", ");
     Draw += (((ui -> inputY2 -> text() == NULL) ? "0" : ui -> inputY2 -> text()) + ", ");
@@ -299,7 +299,7 @@ void MainWindow::on_drw_clicked()
     getData();
     recountPixels();
     drawGraph(true);
-    logger.AddNote("eventEnd: on_drw_clicked \n");
+    logger.AddNote(">eventEnd: on_drw_clicked \n");
 }
 /*void MainWindow::on_drws_clicked()
 {
@@ -313,7 +313,7 @@ void MainWindow::on_drw_clicked()
 */
 void MainWindow::wheelEvent(QWheelEvent *event)
 {
-    logger.AddNote("event: wheelEvent \n");
+    logger.AddNote(">event: wheelEvent \n");
     if (event -> delta() > 0)
     {
         if ((leftX < zoomRate * 5) && (rightX > zoomRate * 5))
@@ -337,7 +337,7 @@ void MainWindow::wheelEvent(QWheelEvent *event)
     }
     recountPixels();
     drawGraph(1);
-    logger.AddNote("eventEnd: wheelEvent \n");
+    logger.AddNote(">eventEnd: wheelEvent \n");
 }
 /*void MainWindow::mouseEvent(QMouseEvent *event)
 {
